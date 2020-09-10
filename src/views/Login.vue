@@ -42,7 +42,7 @@
       <div class="form-group mt-2">
         <small
         v-if="this.$route.name === 'login'">
-          Pas de compte ?<router-link to="/register">Cliquez ici</router-link>
+          Pas de compte ? <router-link to="/register">Cliquez ici</router-link>
         </small>
         <small v-else>Déja un compte ? <router-link to="/login">Connexion</router-link></small>
       </div>
@@ -51,6 +51,8 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex';
+
 export default {
   name: 'Login',
   data() {
@@ -72,6 +74,9 @@ export default {
     };
   },
   methods: {
+    ...mapMutations({
+      mapAccountDataToStore: 'connected',
+    }),
     logUser(e) {
       e.preventDefault();
 
@@ -88,10 +93,20 @@ export default {
         .then((res) => res.json())
         .then((data) => {
           if (data.error) {
+            if (data.message === 'Conflict') {
+              this.errorApi = 'Already a session for this user';
+              return null;
+            }
+
             this.errorApi = data.message;
             return null;
           }
 
+          this.mapAccountDataToStore({
+            id: data.id,
+            mail: this.$refs.inputMail.value,
+            jwt: data.token,
+          });
           this.$router.push('/');
           return null;
         });
@@ -161,7 +176,7 @@ main {
   align-items: center;
   display: flex;
   justify-content: center;
-  height: 97vh;
+  height: 100vh;
   max-height: 100vh;
 
   form {
