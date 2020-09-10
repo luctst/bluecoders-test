@@ -11,30 +11,17 @@ router.use(isConnected());
 
 router.get("/", async function (req, res) {
   const forClient = {};
-  const usersCol = res.locals.mongo.db().collection("users");
-  const userTask = await usersCol.aggregate([
-    {
-      $lookup: {
-        from: "sessions",
-        localField: "userId",
-        foreignField: "_id",
-        as: "t"
-      }
-    },
-    {
-      $project: {
-        "tasks": 1
-      }
-    }
-  ]).toArray();
+  const tasksCol = res.locals.mongo.db().collection("tasks");
+
+  const tasks = await tasksCol.find().toArray();
 
   if (res.locals.data.forClient) {
     forClient.token = res.locals.data.forClient.token;
   }
 
-  forClient.tasks = userTask[0].tasks;
+  forClient.tasks = [...tasks];
 
-  response(res, 200, {
+  return response(res, 200, {
     header: res.locals.data.header,
     newResponse: {...forClient}
   });
