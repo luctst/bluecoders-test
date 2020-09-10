@@ -15,14 +15,11 @@ module.exports = async function registerController(data, mongo) {
     const newUser = await usersCol.insertOne({
       mail: data.mail,
       password: passwordHashed,
-      tasks: {
-        todo: [],
-        doing: [],
-        done: [],
-      },
     });
 
     const sessionData = await sessionLogic(mongo, newUser);
+    sessionData.forClient.id = newUser.insertedId;
+
     return {
       code: 200,
       header: sessionData.header,

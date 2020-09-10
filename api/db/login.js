@@ -33,6 +33,8 @@ module.exports = async function LoginController(data, mongo) {
     }
 
     const sessionData = await sessionLogic(mongo, user);
+    sessionData.forClient.id = user._id;
+
     return {
       code: 200,
       header: sessionData.header,
