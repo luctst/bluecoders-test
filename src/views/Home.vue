@@ -1,18 +1,34 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app">
+    <Loader v-if="!dataLoaded"/>
+    <template></template>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue';
+import Loader from '@/components/Loader.vue';
 
 export default {
-  name: 'Home',
   components: {
-    HelloWorld,
+    Loader,
+  },
+  data() {
+    return {
+      dataLoaded: false,
+      tasks: {},
+    };
+  },
+  mounted() {
+    return fetch('http://localhost:3000/api/tasks')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          return this.$router.push('/login');
+        }
+
+        this.tasks = { ...data.tasks };
+        return null;
+      });
   },
 };
 </script>
