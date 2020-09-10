@@ -1,6 +1,6 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
-const { ObjectID, ObjectId } = require("mongodb");
+const { ObjectId } = require("mongodb");
 
 const isConnected = require("../middlewares/isConnected");
 const response = require("../utils/response");
