@@ -40,16 +40,16 @@ module.exports = function response (resObject, code, ops = {}) {
     }
   };
 
+  if (ops.header) {
+    Object.keys(ops.header).forEach(headerKey => resObject.append(headerKey, ops.header[headerKey]))
+  }
+
   if (code === 204) {
     return resObject.status(code).end();
   }
 
   if (ops.newResponse) {
     httpCode[code] = {...ops.newResponse};
-  }
-
-  if (ops.header) {
-    Object.keys(ops.header).forEach(headerKey => resObject.append(headerKey, ops.header[headerKey]))
   }
 
   return resObject.status(code).json(httpCode[code]);
