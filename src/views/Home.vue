@@ -44,6 +44,12 @@
                   {{new Date(task.created).getMonth()}}/{{new Date(task.created).getFullYear()}}
                   </small>
                 </div>
+                <small
+                  @click.prevent="deleteTask(task._id)"
+                  v-if="accountData.mail === task.author"
+                  class="border rounded p-1 border-danger text-center bg-danger text-white">
+                  Delete
+                </small>
               </router-link>
             </div>
           </section>
@@ -74,10 +80,31 @@ export default {
   },
   methods: {
     ...mapMutations(['updateJwt', 'resetStore']),
+    deleteTask(taskId) {
+      return fetch(`http://localhost:3000/api/tasks/${taskId}`, {
+        credentials: 'include',
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${this.jwt}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.error) return null;
+
+          if (data.token) {
+            this.updateJwt(data.token);
+          }
+
+          this.tasks = [...data.tasks];
+          return null;
+        });
+    },
     addTask() {
       if (this.$refs.inputTask.value.length === 0) return false;
 
       return fetch('http://localhost:3000/api/tasks', {
+        credentials: 'include',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -97,6 +124,10 @@ export default {
             return null;
           }
 
+          if (data.token) {
+            this.updateJwt(data.token);
+          }
+
           if (this.errorAddTask) {
             this.errorAddTask = false;
           }
@@ -109,6 +140,7 @@ export default {
   },
   mounted() {
     return fetch('http://localhost:3000/api/tasks', {
+      credentials: 'include',
       headers: {
         Authorization: `Bearer ${this.jwt}`,
       },
@@ -196,7 +228,7 @@ main {
 
         &--metadata {
           display: flex;
-          margin-top: 12px;
+          margin: 12px 0;
           justify-content: space-between;
         }
       }
