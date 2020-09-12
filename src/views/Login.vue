@@ -81,6 +81,7 @@ export default {
       e.preventDefault();
 
       return fetch(`http://localhost:3000/api${this.$route.path}`, {
+        credentials: 'include',
         method: 'POST',
         headers: {
           'content-type': 'application/json',
