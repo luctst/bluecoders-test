@@ -1,28 +1,54 @@
 <template>
   <div id="app">
-    <Loader v-if="!dataLoaded"/>
+    <Loader v-if="!dataLoaded" />
     <template>
       <main class="container">
         <section class="row">
-          <form class="col-4 pl-0 pr-0">
+          <form class="col-4 pl-0 pr-0" @submit.prevent="addTask">
             <div class="form-group">
               <label>
                 <small>Press enter to add your task</small>
               </label>
-              <input type="text" placeholder="New task" class="form-control"/>
+              <input
+                type="text"
+                placeholder="New task"
+                :class="['form-control', errorAddTask && 'border-danger']"
+                ref="inputTask"
+              />
+              <small
+                class="text-danger"
+                v-if="errorAddTask">Oups il y a un petit probléme essayez de vous déco / reco.
+              </small>
             </div>
           </form>
         </section>
         <section class="row mt-4">
-          <section class="col-5 rounded shadow bg-white todo">
-            <div class="todo--title">
-              <h3 class="h5">Todo</h3>
+          <section class="col-5 pt-2 rounded shadow todo">
+            <h3>Todo</h3>
+            <div class="todo--card" v-for="(task, index) in tasks" :key="index">
+              <router-link :to="{path: `/task/${task._id}`}" v-if="task.status === 'todo'">
+                <div class="todo--card--tags">
+                  <span v-for="(tag, i) in task.tags" :key="i">{{tag}}</span>
+                </div>
+                <h4>{{task.title}}</h4>
+                <p
+                  v-if="task.description.length !== 0"
+                  class="text-muted small"
+                >{{task.description}}</p>
+                <div class="todo--card--metadata">
+                  <small>{{task.author}}</small>
+                  <small
+                    class="text-muted"
+                  >
+                  {{new Date(task.created).getDate()}}/
+                  {{new Date(task.created).getMonth()}}/{{new Date(task.created).getFullYear()}}
+                  </small>
+                </div>
+              </router-link>
             </div>
           </section>
-          <section class="ml-3 col-5 rounded shadow bg-white done">
-            <div class="done--title">
-              <h3 class="h5">Done</h3>
-            </div>
+          <section class="ml-3 col-5 pt-2 rounded shadow done">
+            <h3>Done</h3>
           </section>
         </section>
       </main>
@@ -38,20 +64,48 @@ export default {
   components: {
     Loader,
   },
-  computed: mapState([
-    'jwt',
-  ]),
+  computed: mapState(['jwt', 'accountData']),
   data() {
     return {
+      errorAddTask: false,
       dataLoaded: false,
       tasks: {},
     };
   },
   methods: {
-    ...mapMutations([
-      'updateJwt',
-      'resetStore',
-    ]),
+    ...mapMutations(['updateJwt', 'resetStore']),
+    addTask() {
+      if (this.$refs.inputTask.value.length === 0) return false;
+
+      return fetch('http://localhost:3000/api/tasks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.jwt}`,
+        },
+        body: JSON.stringify(
+          {
+            title: this.$refs.inputTask.value,
+            author: this.accountData.mail,
+          },
+        ),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.error) {
+            this.errorAddTask = true;
+            return null;
+          }
+
+          if (this.errorAddTask) {
+            this.errorAddTask = false;
+          }
+
+          this.tasks = [...data.tasks];
+          this.$refs.inputTask.value = '';
+          return null;
+        });
+    },
   },
   mounted() {
     return fetch('http://localhost:3000/api/tasks', {
@@ -83,6 +137,70 @@ export default {
 
 <style lang="scss" scoped>
 main {
-  margin-top: 10%;
+  margin-top: 8%;
+
+  section {
+    .todo,
+    .done {
+      background-color: #ebecf0;
+      overflow: auto;
+
+      h3 {
+        color: #172b4d;
+        font-size: 0.9em;
+      }
+
+      &--card {
+        margin-bottom: 8px;
+
+        :hover {
+          background-color: #f4f5f7;
+        }
+
+        a {
+          background-color: #fff;
+          border-radius: 3px;
+          box-shadow: 0 1px 0 rgba(9, 30, 66, 0.25);
+          display: inline-block;
+          padding: 6px 8px 8px;
+          width: 100%;
+
+        }
+
+        a:hover {
+          text-decoration: none;
+        }
+
+        &--tags {
+          span {
+            background-color: #f1f8ff;
+            border: 1px solid transparent;
+            border-radius: 2em;
+            color: #0366d6;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 2%;
+            padding: 0 10px;
+          }
+        }
+
+        h4 {
+          color: #172b4d;
+          font-size: 1.1em;
+          margin-top: 20px;
+        }
+
+        p {
+          margin-bottom: 2px;
+        }
+
+        &--metadata {
+          display: flex;
+          margin-top: 12px;
+          justify-content: space-between;
+        }
+      }
+    }
+  }
 }
 </style>
