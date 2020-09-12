@@ -48,6 +48,8 @@ Run this command at first:
 npm install
 ```
 
+Create a `.env` file at the root of your project and this variable `DB_ACCESS`:
+
 ## Usage 💡
 First start the api server with:
 ```
