@@ -51,7 +51,8 @@ module.exports = async function sessionLogic (mongo, userSession, updateSession 
     const cookieOps = {
       httpOnly: true,
       maxAge: 3600,
-      path: "/"
+      path: "/",
+      sameSite: true
     };
     const newToken = await jwtPromisify(
       {
@@ -59,7 +60,7 @@ module.exports = async function sessionLogic (mongo, userSession, updateSession 
       },
       sessionKey.toString("hex"),
       {
-        expiresIn: "6m",
+        expiresIn: "1m",
         noTimestamp: true
       }
     );
