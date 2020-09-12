@@ -26,7 +26,10 @@
           <section class="col-5 pt-2 rounded shadow todo">
             <h3>Todo</h3>
             <div class="todo--card" v-for="(task, index) in tasks" :key="index">
-              <router-link :to="{path: `/task/${task._id}`}" v-if="task.status === 'todo'">
+              <router-link
+                :to="{path: `/task/${task._id}`}"
+                v-if="task.status === 'todo'"
+                draggable="true">
                 <div class="todo--card--tags">
                   <span v-for="(tag, i) in task.tags" :key="i">{{tag}}</span>
                 </div>
@@ -137,32 +140,38 @@ export default {
           return null;
         });
     },
-  },
-  mounted() {
-    return fetch('http://localhost:3000/api/tasks', {
-      credentials: 'include',
-      headers: {
-        Authorization: `Bearer ${this.jwt}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          if (this.jwt.length !== 0) {
-            this.resetStore();
+    fetchData() {
+      fetch('http://localhost:3000/api/tasks', {
+        credentials: 'include',
+        headers: {
+          Authorization: `Bearer ${this.jwt}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.error) {
+            if (this.jwt.length !== 0) {
+              this.resetStore();
+            }
+
+            return this.$router.push('/login');
           }
 
-          return this.$router.push('/login');
-        }
+          if (data.token) {
+            this.updateJwt(data.token);
+          }
 
-        if (data.token) {
-          this.updateJwt(data.token);
-        }
-
-        this.tasks = [...data.tasks];
-        this.dataLoaded = true;
-        return null;
-      });
+          this.tasks = [...data.tasks];
+          this.dataLoaded = true;
+          return null;
+        });
+    },
+  },
+  created() {
+    this.fetchData();
+  },
+  watch: {
+    $route: 'fetchData',
   },
 };
 </script>
