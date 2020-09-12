@@ -4,8 +4,6 @@ const router = express.Router();
 const response = require("../utils/response");
 const loginController = require("../db/login");
 
-router.use(express.json());
-
 router.post("/", async function (req, res) {
   const bodyArray = Object.keys(req.body);
 
