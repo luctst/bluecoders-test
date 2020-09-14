@@ -81,7 +81,7 @@ export default {
     $route: 'fetchData',
   },
   methods: {
-    ...mapMutations(['updateJwt']),
+    ...mapMutations(['updateJwt', 'resetStore']),
     fetchData() {
       return fetch(`http://localhost:3000/api/tasks/${this.$route.params.id}`, {
         credentials: 'include',
@@ -106,6 +106,10 @@ export default {
 
             this.titleNotBind = data.task.title;
             return null;
+          }
+
+          if (this.jwt.length !== 0) {
+            this.resetStore();
           }
 
           return this.$router.push('/login');
