@@ -1,9 +1,9 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
+const cookieParser = require("cookie-parser");
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
-const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const compression = require("compression");
 
@@ -28,8 +28,9 @@ app.use("/api/login", loginRouter);
 app.use("/api/tasks", tasksRouter);
 app.use("/api/logout", logoutRouter);
 
-io.on("connection", function (socket) {
-  console.log(socket, "bonjour");
-})
+io.on('connection', (socket) => {
+  socket.on('sendNewTask', (newTask) => socket.broadcast.emit('addNewTask', newTask));
+  socket.on('sendDeleteTask', (taskId) => socket.broadcast.emit('deleteTask', taskId));
+});
 
-app.listen(3000);
+server.listen(3000);
