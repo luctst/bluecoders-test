@@ -40,7 +40,7 @@
 * VueJs.
 * Vuex.
 * Vue-router.
-* ...
+* Web-socket.
 
 ## Install 🐙
 Run this command at first:
@@ -68,7 +68,6 @@ This project is a little copy of trello app, you can add, update, delete a task 
 
 Some features are coming:
 * Drag and drop cards.
-* Web socket.
 * Switch to the done section.
 * ...
 
