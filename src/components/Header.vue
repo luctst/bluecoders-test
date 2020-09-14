@@ -36,6 +36,7 @@ export default {
     ]),
     disconnect() {
       return fetch('http://localhost:3000/api/logout', {
+        credentials: 'include',
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${this.jwt}`,
