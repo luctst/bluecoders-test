@@ -31,6 +31,7 @@ app.use("/api/logout", logoutRouter);
 io.on('connection', (socket) => {
   socket.on('sendNewTask', (newTask) => socket.broadcast.emit('addNewTask', newTask));
   socket.on('sendDeleteTask', (taskId) => socket.broadcast.emit('deleteTask', taskId));
+  socket.on('sendUpdateTask', (taskUpdated) => socket.broadcast.emit('updateTask', taskUpdated));
 });
 
 server.listen(3000);

@@ -83,7 +83,6 @@ export default {
   },
   sockets: {
     addNewTask(newTask) {
-      console.log(newTask);
       this.tasks.push(newTask);
     },
     deleteTask(taskId) {
@@ -91,6 +90,20 @@ export default {
       const newTasksList = this.tasks.filter((task) => task._id !== taskId);
 
       this.tasks = [...newTasksList];
+    },
+    updateTask(taskUpdate) {
+      const propsToUpdate = Object.keys(taskUpdate);
+
+      this.tasks.forEach((l, index) => {
+        // eslint-disable-next-line no-underscore-dangle
+        if (l._id === taskUpdate._id) {
+          propsToUpdate.forEach((propsKey) => {
+            if (propsKey === '_id') return;
+
+            this.tasks[index][propsKey] = taskUpdate[propsKey];
+          });
+        }
+      });
     },
   },
   methods: {

@@ -184,6 +184,10 @@ export default {
             message: 'Taks update :)',
           };
 
+          this.$socket.emit('sendUpdateTask', {
+            ...dataToUpdate,
+            _id: this.$route.params.id,
+          });
           return null;
         });
     },
