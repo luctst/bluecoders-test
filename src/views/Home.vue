@@ -81,6 +81,18 @@ export default {
       tasks: {},
     };
   },
+  sockets: {
+    addNewTask(newTask) {
+      console.log(newTask);
+      this.tasks.push(newTask);
+    },
+    deleteTask(taskId) {
+      // eslint-disable-next-line no-underscore-dangle
+      const newTasksList = this.tasks.filter((task) => task._id !== taskId);
+
+      this.tasks = [...newTasksList];
+    },
+  },
   methods: {
     ...mapMutations(['updateJwt', 'resetStore']),
     deleteTask(taskId) {
@@ -100,6 +112,7 @@ export default {
           }
 
           this.tasks = [...data.tasks];
+          this.$socket.emit('sendDeleteTask', taskId);
           return null;
         });
     },
@@ -137,6 +150,7 @@ export default {
 
           this.tasks = [...data.tasks];
           this.$refs.inputTask.value = '';
+          this.$socket.emit('sendNewTask', data.tasks[data.tasks.length - 1]);
           return null;
         });
     },
